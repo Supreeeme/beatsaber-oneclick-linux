@@ -1,6 +1,6 @@
 #!/bin/bash
 #set -x
-bs_install=
+bs_install="/run/media/atlan/SSD/Spiele/SteamLibrary/steamapps/common/Beat Saber"
 cd "$( echo "$bs_install" | tr -d '\r' )"
 
 # figure out what we're installing
@@ -65,6 +65,19 @@ elif [[ $uri == "modelsaber" ]]; then
 		
 		sabername=$( echo $key | sed -e 's/[0-9]*\///' -e 's/.saber//' )
 		zenity --info --text="$( echo $sabername| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
+		
+	elif [[ $thing == "/platform/" ]]; then
+		# install platform
+		key=$( echo $1 | sed 's/modelsaber:\/\/platform\///' )
+		
+		(
+		cd "CustomPlatforms"
+		wget -q "https://modelsaber.com/files/platform/$key" 
+		) | zenity --progress --pulsate --auto-close --no-cancel \
+		--text="Installing platform..." --title="OneClick Installer"
+		
+		platformname=$( echo $key | sed -e 's/[0-9]*\///' -e 's/.plat//' )
+		zenity --info --text="$( echo $platformname| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
 	fi
 		
 	
