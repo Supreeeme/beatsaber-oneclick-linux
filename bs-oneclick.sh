@@ -1,6 +1,6 @@
 #!/bin/bash
 #set -x
-bs_install="/run/media/atlan/SSD/Spiele/SteamLibrary/steamapps/common/Beat Saber"
+bs_install=
 cd "$( echo "$bs_install" | tr -d '\r' )"
 
 # figure out what we're installing
