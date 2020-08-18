@@ -52,6 +52,7 @@ elif [[ $uri == "modelsaber" ]]; then
 		if ! [[ -d "CustomSabers" ]]; then
 			zenity --error --title="OneClick Installer" \
 			 --text="You don't have the CustomSabers mod installed! You can install it with <span background='gray' foreground='black' font_family='monospace' allow_breaks='false'>./QBeat --install CustomSabers</span>. Visit <a href='https://github.com/geefr/beatsaber-linux-goodies/tree/master/QBeat'>https://github.com/geefr/beatsaber-linux-goodies/tree/master/QBeat</a> if you need QBeat." --width=500
+			 exit 1
 		fi
 		
 		# install saber
@@ -65,6 +66,27 @@ elif [[ $uri == "modelsaber" ]]; then
 		
 		sabername=$( echo $key | sed -e 's/[0-9]*\///' -e 's/.saber//' )
 		zenity --info --text="$( echo $sabername| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
+		
+	elif [[ $thing == "/platform/" ]]; then
+		
+		if ! [[ -d "CustomPlatforms" ]]; then
+			zenity --error --title="OneClick Installer" \
+			 --text="You don't have the CustomPlatforms mod installed! Check out the BSMG discord to get it." --width=500
+			 exit 1
+		fi
+		
+		# install platform
+		key=$( echo $1 | sed 's/modelsaber:\/\/platform\///' )
+		
+		
+		(
+		cd "CustomPlatforms"
+		wget -q "https://modelsaber.com/files/platform/$key" 
+		) | zenity --progress --pulsate --auto-close --no-cancel \
+		--text="Installing platform..." --title="OneClick Installer"
+		
+		platformname=$( echo $key | sed -e 's/[0-9]*\///' -e 's/.plat//' )
+		zenity --info --text="$( echo $platformname| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
 	fi
 		
 	
