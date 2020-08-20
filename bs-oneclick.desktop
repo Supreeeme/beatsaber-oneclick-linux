@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Beat Saber OneClick Install
-Exec="/home/supreme/slowboi/SteamLibrary/steamapps/common/Beat Saber/bs-oneclick.sh" %u
-StartupNotify=false
-MimeType=x-scheme-handler/beatsaver;x-scheme-handler/modelsaber
-NoDisplay=true

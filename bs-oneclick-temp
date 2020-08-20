@@ -88,6 +88,20 @@ elif [[ $uri == "modelsaber" ]]; then
 		platformname=$( echo $key | sed -e 's/[0-9]*\///' -e 's/.plat//' )
 		zenity --info --text="$( echo $platformname| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
 	fi
-		
+
+# oneclick playlists
+elif [[ $uri == "bsplaylist" ]]; then
+
+	playlist=$( echo $1 | sed "s/bsplaylist:\/\/playlist\///" )
+	pname=$( echo $playlist | sed "s/https:\/\/bsaber.com\/PlaylistAPI\///" )
+	cd Playlists
 	
+	if [[ $( ls | grep $pname ) ]]; then
+		zenity --error --title="OneClick Installer" --text="You already have this playlist installed!"
+		exit 1
+	fi
+	
+	wget -q $playlist
+	cd ..
+	./playlist-installer "$bs_install/Playlists/$pname" "$bs_install/Beat Saber_Data/CustomLevels"
 fi

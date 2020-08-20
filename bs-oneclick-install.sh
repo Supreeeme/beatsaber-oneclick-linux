@@ -1,9 +1,12 @@
 #!/bin/bash
 # installs the scripts and what not
-set -x
+#set -x
+cp bs-oneclick-temp bs-oneclick.sh
+cp playlist-installer-temp playlist-installer
+cp bs-oneclick-desktop-temp bs-oneclick.desktop
+
 mkdir -p ~/.local/share/applications
-mv bs-oneclick.desktop ~/.local/share/applications
-xdg-mime default ~/.local/share/applications/bs-oneclick.desktop x-schema-handler/beatsaver x-schema-handler/modelsaber
+xdg-mime default bs-oneclick.desktop x-scheme-handler/beatsaver x-scheme-handler/modelsaber x-scheme-handler/bsplaylist
 
 bs_install="$HOME/.local/share/Steam/steamapps/common/Beat Saber"
 
@@ -15,7 +18,10 @@ while : ; do
 		# welcome to slash hell
 		bs_install_sed=$( echo $bs_install | sed 's,/,\\/,g' )
 		sed -i "s,bs_install=.*,bs_install=\"$bs_install_sed\"," bs-oneclick.sh
+		sed -i "s,Exec=.*,Exec=\"$bs_install_sed/bs-oneclick.sh\" %u," bs-oneclick.desktop
 		mv bs-oneclick.sh "$bs_install"
+		mv playlist-installer "$bs_install"
+		mv bs-oneclick.desktop ~/.local/share/applications
 		zenity --info --title="OneClick Installer" --text="OneClick Installer installed. Enjoy!" --icon-name="checkbox-checked"
 		break
 	fi
