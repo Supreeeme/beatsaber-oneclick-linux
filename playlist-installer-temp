@@ -1,43 +1,46 @@
 #!/bin/bash
 # playlist-installer: takes in a .bplist file, downloads all the songs listed for the playlist.
+#set -x
 
 cd "$2"
 if ! [ -d "$2" ]; then zenity --error --text="Missing directory argument."; exit 1; fi
 
 # playlist title
-pltitle=$( cat "$1" | grep -Eo "\"playlistTitle\":.*," | sed -e "s/\"playlistTitle\": \"//" -e "s/\",//" )
+pltitle=$( cat "$1" | grep -Eo "\"playlistTitle\":[^,]*," | sed -e "s/\"playlistTitle\": *\"//" -e "s/\",//" )
 
 # get the song list
 songlist=$( cat "$1" | grep -Ezo "\"songs\".*" )
 
 (
-while IFS='' read -r line ; do
-	if [[ $line =~ "hash" ]]; then 
-		songhash=$( echo $line | tr -d " " | sed "s/\"hash\"://" | tr -d \" | tr -d "\r" )
-		dllink=$( curl -s "https://beatsaver.com/api/maps/by-hash/$songhash" | sed -e "s/.*\downloadURL\":\"//" | grep -Eo "/api/download/key/[a-zA-Z0-9]+" )
+while IFS='},' read -ra songs ; do
+	for line in "${songs[@]}"; do
+		if [[ $line =~ "hash" ]]; then 
+			songhash=$( echo $line | tr -d " " | sed -e "s/\"hash\"://" -e "s/,//" | tr -d \" | tr -d "\r" )
+			dllink=$( curl -s "https://beatsaver.com/api/maps/by-hash/$songhash" | sed -e "s/.*\downloadURL\":\"//" | grep -Eo "/api/download/key/[a-zA-Z0-9]+" )
+			
+			key=$( echo $dllink | sed -E "s/\/api\/download\/key\/([a-zA-Z0-9]+)/\1/" )
 		
-		key=$( echo $dllink | sed -E "s/\/api\/download\/key\/([a-zA-Z0-9]+)/\1/" )
-	
-		# check if song already installed first
-		if ! [[ $( ls | grep $key ) ]]; then
-			dir=$key"-dir"
-			mkdir $dir
-			cd $dir
+			# check if song already installed first
+			if ! [[ $( ls | grep $key ) ]]; then
+				dir=$key"-dir"
+				mkdir $dir
+				cd $dir
+				
+				wget -q https://beatsaver.com/api/download/key/$key
+				unzip $key
+				rm $key
+				
+				cd ..
+				# rename directory
+				info=$( ls $dir | grep -i info ) # case insensitive!
+		 		songname=$( grep "_songName" $dir/$info \
+						| tr -d "[:space:]" \
+						| sed -e 's/^\"_songName\"\:\"//' -e 's/\",$//')
+				mv $dir "$songname ($key)"
+			fi
 			
-			wget -q https://beatsaver.com/api/download/key/$key
-			unzip $key
-			rm $key
-			
-			cd ..
-			# rename directory
-			info=$( ls $dir | grep -i info ) # case insensitive!
-	 		songname=$( grep "_songName" $dir/$info \
-					| tr -d "[:space:]" \
-					| sed -e 's/^\"_songName\"\:\"//' -e 's/\",$//')
-			mv $dir "$songname ($key)"
 		fi
-		
-	fi
+	done
 done <<< $songlist
 ) | zenity --progress --pulsate --auto-close --no-cancel \
 		--text="Installing $( echo $pltitle | sed 's/\&/\&amp;/' )..." --title="Playlist Installer" --width=300
