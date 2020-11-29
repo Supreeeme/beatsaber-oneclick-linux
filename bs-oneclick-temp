@@ -1,5 +1,7 @@
 #!/bin/bash
 #set -x
+set -e
+
 bs_install=
 cd "$( echo "$bs_install" | tr -d '\r' )"
 
@@ -14,15 +16,13 @@ if [[ $uri == "beatsaver" ]]; then
 	
 	# check if song already installed first
 	if [[ $( ls | grep $key ) ]]; then
-		zenity --error --title="OneClick Installer" --text="You already have this song installed!"
+		zenity --notification --window-icon="error" --title="OneClick Installer" --text="You already have this song installed!"
 		exit 1
 	fi
 	
 	dir=$key"-dir"
 	(
-
 		# make directory
-		
 		mkdir $dir
 		cd $dir
 		
@@ -33,15 +33,14 @@ if [[ $uri == "beatsaver" ]]; then
 
 	) | zenity --progress --pulsate --auto-close --no-cancel \
 		--text="Installing song..." --title="OneClick Installer"
-		
+
 	# rename directory
 	info=$( ls $dir | grep -i info ) # case insensitive!
- 	songname=$( grep "_songName" $dir/$info \
-				| tr -d "[:space:]" \
-				| sed -e 's/^\"_songName\"\:\"//' -e 's/\",$//')
-	mv $dir "$songname ($key)"
+	songname=$( jq -r "._songName" $dir/$info )
+	author=$( jq -r "._levelAuthorName" $dir/$info )
+	mv $dir "$key ($songname - $author)"
 
-	zenity --info --text="$( echo $songname | sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
+	zenity --notification --window-icon="info" --text="$( echo $songname | sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer"
 
 # oneclick saber
 elif [[ $uri == "modelsaber" ]]; then
@@ -51,28 +50,28 @@ elif [[ $uri == "modelsaber" ]]; then
 		# make sure Custom Sabers is installed
 		if ! [[ -d "CustomSabers" ]]; then
 			zenity --error --title="OneClick Installer" \
-			 --text="You don't have the CustomSabers mod installed! You can install it with <span background='gray' foreground='black' font_family='monospace' allow_breaks='false'>./QBeat --install CustomSabers</span>. Visit <a href='https://github.com/geefr/beatsaber-linux-goodies/tree/master/QBeat'>https://github.com/geefr/beatsaber-linux-goodies/tree/master/QBeat</a> if you need QBeat." --width=500
-			 exit 1
+				--text="You don't have the CustomSabers mod installed! You can install it with <span background='gray' foreground='black' font_family='monospace' allow_breaks='false'>./QBeat --install CustomSabers</span>. Visit <a href='https://github.com/geefr/beatsaber-linux-goodies/tree/master/QBeat'>https://github.com/geefr/beatsaber-linux-goodies/tree/master/QBeat</a> if you need QBeat." --width=500
+			exit 1
 		fi
 		
 		# install saber
 		key=$( echo $1 | sed 's/modelsaber:\/\/saber\///' )
 		
 		(
-		cd "CustomSabers"
-		wget -q "https://modelsaber.com/files/saber/$key" 
+			cd "CustomSabers"
+			wget -q "https://modelsaber.com/files/saber/$key"
 		) | zenity --progress --pulsate --auto-close --no-cancel \
 		--text="Installing saber..." --title="OneClick Installer"
 		
 		sabername=$( echo $key | sed -e 's/[0-9]*\///' -e 's/.saber//' )
-		zenity --info --text="$( echo $sabername| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
+		zenity --notification --window-icon="info" --text="$( echo $sabername| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
 		
 	elif [[ $thing == "/platform/" ]]; then
 		
 		if ! [[ -d "CustomPlatforms" ]]; then
-			zenity --error --title="OneClick Installer" \
-			 --text="You don't have the CustomPlatforms mod installed! Check out the BSMG discord to get it." --width=500
-			 exit 1
+			zenity --notification --window-icon="error" --title="OneClick Installer" \
+			--text="You don't have the CustomPlatforms mod installed! Check out the BSMG discord to get it." --width=500
+			exit 1
 		fi
 		
 		# install platform
@@ -80,13 +79,13 @@ elif [[ $uri == "modelsaber" ]]; then
 		
 		
 		(
-		cd "CustomPlatforms"
-		wget -q "https://modelsaber.com/files/platform/$key" 
+			cd "CustomPlatforms"
+			wget -q "https://modelsaber.com/files/platform/$key"
 		) | zenity --progress --pulsate --auto-close --no-cancel \
-		--text="Installing platform..." --title="OneClick Installer"
+			--text="Installing platform..." --title="OneClick Installer"
 		
 		platformname=$( echo $key | sed -e 's/[0-9]*\///' -e 's/.plat//' )
-		zenity --info --text="$( echo $platformname| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
+		zenity --notification --window-icon="info" --text="$( echo $platformname| sed 's/\&/\&amp;/' ) installed." --title="OneClick Installer" --width=300 --icon-name="checkbox-checked"
 	fi
 
 # oneclick playlists
@@ -97,7 +96,7 @@ elif [[ $uri == "bsplaylist" ]]; then
 	cd Playlists
 	
 	if [[ $( ls | grep $pname ) ]]; then
-		zenity --error --title="OneClick Installer" --text="You already have this playlist installed!"
+		zenity --notification --window-icon="error" --title="OneClick Installer" --text="You already have this playlist installed!"
 		exit 1
 	fi
 	
