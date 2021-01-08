@@ -33,10 +33,9 @@ while IFS='},' read -ra songs ; do
 				cd ..
 				# rename directory
 				info=$( ls $dir | grep -i info ) # case insensitive!
-		 		songname=$( grep "_songName" $dir/$info \
-						| tr -d "[:space:]" \
-						| sed -e 's/^\"_songName\"\:\"//' -e 's/\",$//')
-				mv $dir "$songname ($key)"
+				songname=$( jq -r "._songName" $dir/$info )
+				author=$( jq -r "._levelAuthorName" $dir/$info )
+				mv $dir "$key ($songname - $author)"
 			fi
 			
 		fi
@@ -45,5 +44,4 @@ done <<< $songlist
 ) | zenity --progress --pulsate --auto-close --no-cancel \
 		--text="Installing $( echo $pltitle | sed 's/\&/\&amp;/' )..." --title="Playlist Installer" --width=300
 
-zenity --info --text="$( echo $pltitle | sed 's/\&/\&amp;/' ) installed." --title="Playlist Installer" --width=300 --icon-name="checkbox-checked"
-
+zenity --notification --window-icon="info" --text="$( echo $pltitle | sed 's/\&/\&amp;/' ) installed." --title="Playlist Installer" 
