@@ -16,7 +16,7 @@ while IFS='},' read -ra songs ; do
 	for line in "${songs[@]}"; do
 		if [[ $line =~ "hash" ]]; then 
 			songhash=$( echo $line | tr -d " " | sed -e "s/\"hash\"://" -e "s/,//" | tr -d \" | tr -d "\r" )
-			dllink=$( curl -s "https://beatsaver.com/api/maps/by-hash/$songhash" | sed -e "s/.*\downloadURL\":\"//" | grep -Eo "/api/download/key/[a-zA-Z0-9]+" )
+			dllink=$( curl -A "Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0" -s "https://beatsaver.com/api/maps/by-hash/$songhash" | sed -e "s/.*\downloadURL\":\"//" | grep -Eo "/api/download/key/[a-zA-Z0-9]+" )
 			
 			key=$( echo $dllink | sed -E "s/\/api\/download\/key\/([a-zA-Z0-9]+)/\1/" )
 		
