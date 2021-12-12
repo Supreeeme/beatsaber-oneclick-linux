@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Beat Saber OneClick Install
-Exec= %u
-StartupNotify=false
-MimeType=x-scheme-handler/beatsaver;x-scheme-handler/modelsaber;x-scheme-handler/bsplaylist
-NoDisplay=true
