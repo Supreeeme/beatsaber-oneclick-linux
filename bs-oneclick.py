@@ -223,7 +223,7 @@ if __name__ == "__main__":
 
     bs_install = None
     try:
-        with open("bs-path.txt") as file:
+        with open(script_path/"bs-path.txt") as file:
             bs_install = pathlib.Path(file.readline())
     except FileNotFoundError: # missing bs-path.txt
         invalid_path_error()
