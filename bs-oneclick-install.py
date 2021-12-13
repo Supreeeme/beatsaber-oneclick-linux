@@ -52,7 +52,7 @@ NoDisplay=true
         shutil.move(src=pathlib.Path.cwd()/'bs-oneclick.desktop', dst=full_path)
 
         # set default mime type
-        subprocess.run(['xdg-mime','default', full_path,
+        subprocess.run(['xdg-mime','default', 'bs-oneclick.desktop',
             'x-scheme-handler/beatsaver','x-scheme-handler/modelsaber','x-scheme-handler/bsplaylist'])
 
         GLib.idle_add(label.set_text, "Beat Saber OneClick has been installed. Enjoy!")
