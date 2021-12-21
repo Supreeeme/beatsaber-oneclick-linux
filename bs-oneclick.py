@@ -76,7 +76,7 @@ def song_dl(key: str, status: SongDLStatus = None):
     song_name = info["_songName"]
     author = info["_levelAuthorName"]
     os.chdir("..")
-    os.rename(song_dir, f"{key} ({song_name} - {author})")
+    os.rename(song_dir, f"{key} ({song_name} - {author})".replace("/", "_"))
 
     if status: 
         status.finish.set()
