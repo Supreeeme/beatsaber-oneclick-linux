@@ -32,7 +32,7 @@ def action():
         desktop_file = f"""[Desktop Entry]
 Type=Application
 Name=Beat Saber OneClick Install
-Exec={os.getcwd()+'/bs-oneclick.py'} %u
+Exec="{os.getcwd()+'/bs-oneclick.py'}" %u
 StartupNotify=false
 MimeType=x-scheme-handler/beatsaver;x-scheme-handler/modelsaber;x-scheme-handler/bsplaylist
 NoDisplay=true
