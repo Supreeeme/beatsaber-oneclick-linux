@@ -16,6 +16,9 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("Notify", "0.7")
 from gi.repository import Gtk, GLib, Notify
 
+# copied from ModAssistant
+illegal_chars = "[<>:/\\|?*\"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u0009\u000a\u000b\u000c\u000d\u000e\u000d\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001f]"
+
 # get ui objects
 script_path = pathlib.Path(__file__).resolve().parent
 builder = Gtk.Builder.new_from_file(str(script_path/'song_install.ui'))
@@ -76,7 +79,7 @@ def song_dl(key: str, status: SongDLStatus = None):
     song_name = info["_songName"]
     author = info["_levelAuthorName"]
     os.chdir("..")
-    os.rename(song_dir, f"{key} ({song_name} - {author})".replace("/", "_"))
+    os.rename(song_dir, re.sub(illegal_chars, "_", f"{key} ({song_name} - {author})"))
 
     if status: 
         status.finish.set()
